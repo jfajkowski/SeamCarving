@@ -1,0 +1,2 @@
+# seam-carving
+OpenCV + Qt
