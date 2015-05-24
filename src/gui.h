@@ -1,24 +1,18 @@
-#ifndef SEAM_CARVING_H
-#define SEAM_CARVING_H
+#ifndef GUI_H
+#define GUI_H
 
 #include <QtWidgets/QMainWindow>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
-#include "ui_seam_carving.h"
-#include <iostream>
-#include <string>
+#include "ui_gui.h"
 #include "image.h"
 #include "energy_demo.h"
 
-extern bool demo;
-
-class seam_carving : public QMainWindow
+class gui : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	seam_carving(QWidget *parent = 0);
-	~seam_carving();
+	gui(QWidget *parent = 0);
+	~gui();
 
 public slots:
 	void clickedLoad();
@@ -34,10 +28,10 @@ public slots:
 	void setCanny() { edge_type = 2; }
 
 private:
-	Ui::seam_carvingClass ui;
+	Ui::guiClass ui;
 	int number_of_seams;
 	Image i;
 	Mat src;
 };
 
-#endif // SEAM_CARVING_H
+#endif // GUI_H
