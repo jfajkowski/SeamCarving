@@ -1,6 +1,6 @@
 #include "image.h"
 
-Image::Image(const Mat &src, string n)
+Image::Image(const Mat &src, std::string n)
 {
 	name = n;
 	height = src.rows;
@@ -260,7 +260,7 @@ void Image::addSeams(bool flag)
 	}
 }
 
-void Image::deleteVerticalSeams(int n, string window_name)
+void Image::deleteVerticalSeams(int n, std::string window_name)
 {
 	for (int x = 0; x < n; x++)
 	{
@@ -276,7 +276,7 @@ void Image::deleteVerticalSeams(int n, string window_name)
 	}
 }
 
-void Image::deleteHorizontalSeams(int n, string window_name)
+void Image::deleteHorizontalSeams(int n, std::string window_name)
 {
 	rotateImage();
 	for (int y = 0; y < n; y++)
@@ -296,18 +296,18 @@ void Image::deleteHorizontalSeams(int n, string window_name)
 	rotateImage();
 }
 
-void Image::showImage(string window_name)
+void Image::showImage(std::string window_name)
 {
 	imshow(window_name, image);
 	saveFile();
 }
 
-void Image::showEnergy(string window_name)
+void Image::showEnergy(std::string window_name)
 {
 	imshow(window_name, energy);
 }
 
-void Image::showCumulatedEnergy(string window_name)
+void Image::showCumulatedEnergy(std::string window_name)
 {
 	calculateCumulatedEnergy();
 	imshow(window_name, normaliseMat());
