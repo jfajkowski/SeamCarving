@@ -17,14 +17,14 @@ set(SOURCE_FILES
     src/main.cpp
     src/energy_demo.h
     src/energy_demo.cpp
-    src/seam_carving.h
-    src/seam_carving.cpp
+    src/gui.h
+    src/gui.cpp
     src/image.h
     src/image.cpp
 )
 
 set(UI_FILES
-    ui/seam_carving.ui
+    ui/gui.ui
 )
 source_group("UI Files" FILES ${UI_FILES})
 
@@ -38,5 +38,5 @@ add_executable(${PROJECT} Win32
     ${UI_FILES}
 )
 
-qt5_use_modules(${PROJECT} Widgets)
 target_link_libraries(${PROJECT} ${OpenCV_LIBS})
+qt5_use_modules(${PROJECT} Widgets)
