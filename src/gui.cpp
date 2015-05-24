@@ -1,9 +1,10 @@
-#include "seam_carving.h"
+#include "gui.h"
+#include <qmessagebox.h>
+#include <qfiledialog.h>
 
-seam_carving::seam_carving(QWidget *parent)
+gui::gui(QWidget *parent)
 	: QMainWindow(parent)
 {
-	number_of_seams = 0;
 	ui.setupUi(this);
 	this->move(QPoint(0, 0));
 	ui.number->setMaximum(0);
@@ -20,7 +21,12 @@ seam_carving::seam_carving(QWidget *parent)
 	connect(ui.canny, SIGNAL(clicked()), this, SLOT(setCanny()));
 }
 
-void seam_carving::clickedLoad()
+gui::~gui()
+{
+
+}
+
+void gui::clickedLoad()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Open File"), QString(""), QString("All files (*.*);;Picture (*.jpg)"));
 	if (path.isEmpty()) return;
@@ -51,7 +57,7 @@ void seam_carving::clickedLoad()
 
 }
 
-void seam_carving::clickedAddV()
+void gui::clickedAddV()
 {
 	if (!src.data)
 	{
@@ -66,7 +72,7 @@ void seam_carving::clickedAddV()
 	i.showImage("Preview");
 }
 
-void seam_carving::clickedDelV()
+void gui::clickedDelV()
 {
 	if (!src.data)
 	{
@@ -80,7 +86,7 @@ void seam_carving::clickedDelV()
 	i.showImage("Preview");
 }
 
-void seam_carving::clickedAddH()
+void gui::clickedAddH()
 {
 	if (!src.data)
 	{
@@ -98,7 +104,7 @@ void seam_carving::clickedAddH()
 	i.showImage("Preview");
 }
 
-void seam_carving::clickedDelH()
+void gui::clickedDelH()
 {
 	if (!src.data)
 	{
@@ -112,7 +118,7 @@ void seam_carving::clickedDelH()
 	i.showImage("Preview");
 }
 
-void seam_carving::clickedEnergy()
+void gui::clickedEnergy()
 {
 	if (!src.data)
 	{
@@ -125,18 +131,13 @@ void seam_carving::clickedEnergy()
 	showEnergyDemo(src);
 }
 
-void seam_carving::clickedDemo()
+void gui::clickedDemo()
 {
 	demo = !demo;
 }
 
-void seam_carving::changedNumberOfSeams(int k)
+void gui::changedNumberOfSeams(int k)
 {
 	number_of_seams = k;
 	ui.label_3->setText(QString::number(k));
-}
-
-seam_carving::~seam_carving()
-{
-
 }
