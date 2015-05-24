@@ -13,7 +13,7 @@ class Image
 {
 public:
 	Image(){};
-	Image(const Mat &src, string n);
+	Image(const Mat &src, std::string n);
 	~Image(){};
 	int returnWidth() { return width; }
 	int returnHeight(){ return height; }
@@ -28,13 +28,13 @@ public:
 	void findSeams(int n);
 	void addSeams(bool flag);
 
-	void deleteVerticalSeams(int n, string window_name);
-	void deleteHorizontalSeams(int n, string window_name);
+	void deleteVerticalSeams(int n, std::string window_name);
+	void deleteHorizontalSeams(int n, std::string window_name);
 
 	//Show images
-	void showImage(string window_name);
-	void showEnergy(string window_name);
-	void showCumulatedEnergy(string window_name);
+	void showImage(std::string window_name);
+	void showEnergy(std::string window_name);
+	void showCumulatedEnergy(std::string window_name);
 	void resizeImage();
 	void rotateImage();
 	Mat normaliseMat();
@@ -43,7 +43,7 @@ public:
 
 private:
 	int found_seams;
-	string name;
+	std::string name;
 	int height;
 	int width;
 	Mat_<Vec3b> image;
