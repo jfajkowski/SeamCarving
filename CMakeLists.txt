@@ -21,6 +21,9 @@ set(SOURCE_FILES
     src/gui.cpp
     src/image.h
     src/image.cpp
+    src/list.h
+    src/node.h
+    src/iterator.h
 )
 
 set(UI_FILES
