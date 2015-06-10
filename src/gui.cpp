@@ -7,15 +7,17 @@ gui::gui(QWidget *parent)
 {
 	ui.setupUi(this);
 	this->move(QPoint(0, 0));
-	ui.number->setMaximum(0);
+	ui.numberV->setMaximum(0);
+	ui.numberH->setMaximum(0);
+	number_of_vertical_seams = 0;
+	number_of_horizontal_seams = 0;
 	connect(ui.load, SIGNAL(clicked()), this, SLOT(clickedLoad()));
-	connect(ui.addV, SIGNAL(clicked()), this, SLOT(clickedAddV()));
-	connect(ui.delV, SIGNAL(clicked()), this, SLOT(clickedDelV()));
-	connect(ui.addH, SIGNAL(clicked()), this, SLOT(clickedAddH()));
-	connect(ui.delH, SIGNAL(clicked()), this, SLOT(clickedDelH()));
+	connect(ui.add, SIGNAL(clicked()), this, SLOT(clickedAdd()));
+	connect(ui.del, SIGNAL(clicked()), this, SLOT(clickedDel()));
 	connect(ui.energy, SIGNAL(clicked()), this, SLOT(clickedEnergy()));
 	connect(ui.demo, SIGNAL(clicked()), this, SLOT(clickedDemo()));
-	connect(ui.number, SIGNAL(valueChanged(int)), this, SLOT(changedNumberOfSeams(int)));
+	connect(ui.numberV, SIGNAL(valueChanged(int)), this, SLOT(changedNumberOfVerticalSeams(int)));
+	connect(ui.numberH, SIGNAL(valueChanged(int)), this, SLOT(changedNumberOfHorizontalSeams(int)));
 	connect(ui.sobel, SIGNAL(clicked()), this, SLOT(setSobel()));
 	connect(ui.scharr, SIGNAL(clicked()), this, SLOT(setScharr()));
 	connect(ui.canny, SIGNAL(clicked()), this, SLOT(setCanny()));
@@ -24,6 +26,26 @@ gui::gui(QWidget *parent)
 gui::~gui()
 {
 
+}
+
+void gui::errorDialog(std::string s)
+{
+	QMessageBox messageBox;
+	messageBox.critical(0, "Error", QString::fromStdString(s));
+	messageBox.setFixedSize(500, 200);
+}
+
+void gui::setMaxNumbersOfSeams()
+{
+	if (i.returnHeight() > 200)
+		ui.numberH->setMaximum(i.returnHeight() - 100);
+	else
+		ui.numberH->setMaximum(0);
+
+	if (i.returnWidth() > 200)
+		ui.numberV->setMaximum(i.returnWidth() - 100);
+	else
+		ui.numberV->setMaximum(0);
 }
 
 void gui::clickedLoad()
@@ -35,9 +57,7 @@ void gui::clickedLoad()
 
 	if (!src.data)
 	{
-		QMessageBox messageBox;
-		messageBox.critical(0, "Error", "Can't open file.");
-		messageBox.setFixedSize(500, 200);
+		errorDialog("Can't open file.");
 		return;
 	}
 
@@ -46,10 +66,7 @@ void gui::clickedLoad()
 
 	i = Image(src, file_name.toStdString());
 
-	if (i.returnHeight() > i.returnWidth())
-		ui.number->setMaximum(i.returnHeight());
-	else
-		ui.number->setMaximum(i.returnWidth());
+	setMaxNumbersOfSeams();
 
 	namedWindow("Preview", CV_WINDOW_AUTOSIZE);
 	i.showImage("Preview");
@@ -57,74 +74,52 @@ void gui::clickedLoad()
 
 }
 
-void gui::clickedAddV()
+void gui::clickedAdd()
 {
 	if (!src.data)
 	{
-		QMessageBox messageBox;
-		messageBox.critical(0, "Error", "Can't find file.");
-		messageBox.setFixedSize(500, 200);
+		errorDialog("No picture loaded.");
 		return;
 	}
-	i.findSeams(number_of_seams);
-	if (demo) i.addSeams(0);
-	i.addSeams(1);
-	i.showImage("Preview");
+	if (number_of_vertical_seams > 0)
+	{
+		i.findSeams(number_of_vertical_seams);
+		i.addSeamsUsingList(demo);
+	}
+	
+	if (number_of_horizontal_seams > 0)
+	{
+		i.rotateImage();
+		i.findSeams(number_of_horizontal_seams);
+		i.addSeamsUsingList(demo);
+		i.rotateImage();
+		i.showImage("Preview");
+	}
+
+	setMaxNumbersOfSeams();
 }
 
-void gui::clickedDelV()
+void gui::clickedDel()
 {
 	if (!src.data)
 	{
-		QMessageBox messageBox;
-		messageBox.critical(0, "Error", "Can't find file.");
-		messageBox.setFixedSize(500, 200);
+		errorDialog("No picture loaded.");
 		return;
 	}
-	if (number_of_seams > i.returnWidth()) number_of_seams = i.returnWidth();
-	i.deleteVerticalSeams(number_of_seams, "Preview");
+	i.deleteVerticalSeams(number_of_vertical_seams, "Preview");
 	i.showImage("Preview");
-}
-
-void gui::clickedAddH()
-{
-	if (!src.data)
-	{
-		QMessageBox messageBox;
-		messageBox.critical(0, "Error", "Can't find file.");
-		messageBox.setFixedSize(500, 200);
-		return;
-	}
-
-	i.rotateImage();
-	i.findSeams(number_of_seams);
-	if (demo) i.addSeams(0);
-	i.addSeams(1);
-	i.rotateImage();
+	
+	i.deleteHorizontalSeams(number_of_horizontal_seams, "Preview");
 	i.showImage("Preview");
-}
 
-void gui::clickedDelH()
-{
-	if (!src.data)
-	{
-		QMessageBox messageBox;
-		messageBox.critical(0, "Error", "Can't find file.");
-		messageBox.setFixedSize(500, 200);
-		return;
-	}
-	if (number_of_seams > i.returnHeight()) number_of_seams = i.returnHeight();
-	i.deleteHorizontalSeams(number_of_seams, "Preview");
-	i.showImage("Preview");
+	setMaxNumbersOfSeams();
 }
 
 void gui::clickedEnergy()
 {
 	if (!src.data)
 	{
-		QMessageBox messageBox;
-		messageBox.critical(0, "Error", "Can't find file.");
-		messageBox.setFixedSize(500, 200);
+		errorDialog("No picture loaded.");
 		return;
 	}
 
@@ -136,8 +131,14 @@ void gui::clickedDemo()
 	demo = !demo;
 }
 
-void gui::changedNumberOfSeams(int k)
+void gui::changedNumberOfVerticalSeams(int k)
 {
-	number_of_seams = k;
-	ui.label_3->setText(QString::number(k));
+	number_of_vertical_seams = k;
+	ui.labelV->setText(QString::number(k));
+}
+
+void gui::changedNumberOfHorizontalSeams(int k)
+{
+	number_of_horizontal_seams = k;
+	ui.labelH->setText(QString::number(k));
 }
