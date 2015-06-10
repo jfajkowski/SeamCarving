@@ -11,6 +11,15 @@ Image::Image(const Mat &src, std::string n)
 	calculateCumulatedEnergy();
 }
 
+void Image::resetImage()
+{
+	height = duplicate.rows;
+	width = duplicate.cols;
+	image = duplicate;
+	calculateEnergy();
+	calculateCumulatedEnergy();
+}
+
 void Image::calculateEnergy()
 {
 	///Find edges
@@ -219,9 +228,9 @@ void Image::findSeams(int n)
 	}
 }
 
-void Image::addSeams(bool flag)
+void Image::addSeams(bool demo)
 {
-	if (!flag)
+	if (!demo)
 	{
 		for (int y = 0; y < height; y++)
 		{
@@ -371,4 +380,57 @@ Vec3b Image::mixColors(Vec3b &a, Vec3b &b)
 void Image::saveFile()
 {
 	imwrite("out.jpg", image);
+}
+
+void Image::loadPixelsToList()
+{
+	pixels.resize(height);
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+			pixels[y].push_back(image.at<Vec3b>(y, x));
+	}	
+}
+
+void Image::savePixelsFromList()
+{
+	for (int y = 0; y < height; y++)
+	{
+		Iterator<Vec3b> it = pixels[y].begin();
+		for (int x = 0; x < width; x++)
+		{
+			image.at<Vec3b>(y, x) = it.get()->getData();
+			it++;
+		}
+	}
+}
+
+void Image::addSeamsUsingList(bool demo)
+{
+	loadPixelsToList();
+	copyMakeBorder(image, image, 0, 0, 0, found_seams, BORDER_CONSTANT);
+	for (int y = 0; y < height; y++)
+	{
+		int count = 0;
+		for (int n = 0; n < found_seams; n++)
+		{
+			Iterator<Vec3b> it = pixels[y].begin();
+			if (!demo)
+			{
+				for (int i = 0; i < paths.at(n).at(y) + count - 1; i++) it++;
+				Vec3b neighbor = it++.get()->getData();
+				pixels[y].insert(mixColors(neighbor, it.get()->getData()), it);
+			}
+			else
+			{
+				for (int i = 0; i < paths.at(n).at(y) + count; i++) it++;
+				pixels[y].insert({ 0, 0, 255 }, it);
+			}
+			
+		}
+	}
+	width += found_seams;
+	savePixelsFromList();
+	energy.release();
+	calculateEnergy();
 }
