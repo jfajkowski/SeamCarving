@@ -4,6 +4,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <string>
+#include "list.h"
 
 using namespace cv;
 extern bool demo;
@@ -18,15 +19,19 @@ public:
 	int returnWidth() { return width; }
 	int returnHeight(){ return height; }
 
+	void loadPixelsToList();
+	void savePixelsFromList();
 	void calculateEnergy();
 	void calculateCumulatedEnergy();
+	void resetImage();
 
 	void calculatePixelEnergy(int x, int y);
 	void findSeam();
 	void deleteSeam(bool flag);
 
 	void findSeams(int n);
-	void addSeams(bool flag);
+	void addSeams(bool demo);
+	void addSeamsUsingList(bool demo);
 
 	void deleteVerticalSeams(int n, std::string window_name);
 	void deleteHorizontalSeams(int n, std::string window_name);
@@ -51,5 +56,6 @@ private:
 	Mat energy;
 	Mat cumulated_energy;
 	std::vector<std::vector<int>> paths;
+	std::vector<List<Vec3b>> pixels;
 
 };
